@@ -868,7 +868,7 @@ cbr %>%
             beneficiaries = sum(beneficiaries, na.rm = TRUE)) %>% 
   mutate(`%_beneficiaries` = round(beneficiaries / sum(beneficiaries) * 100, digits = 2)) %>% 
   flextable() %>% 
-  set_caption("14 partners have reported planned activities") %>%
+  set_caption("15 partners have reported planned activities") %>%
   theme_zebra() %>%
   set_table_properties(layout = "autofit", width = .6)
 ```
