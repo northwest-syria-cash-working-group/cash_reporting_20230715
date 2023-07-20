@@ -160,15 +160,10 @@ eq <- eq %>%
             by = "admin3pcode")
 
 cbr <- read_csv("./data/cbr_com.csv") %>% 
- # filter(total_value_per_hh != 75) %>%
+  # filter(total_value_per_hh != 75) %>%
   filter(str_detect(cluster, "Multipurpose")) %>% 
   mutate(month = month(end_date)) %>% 
   replace_na(list(beneficiaries = 0)) %>% 
-  # Irritating that this recording has to be done outside of the 
-  # read_4ws function, but it'll throw an error otherwise, since 
-  # ?some? partners have left some of these columns entirely blank? 
-  # Not sure what the cause of the error is and 
-  # I have no time to fix it now 
   mutate(governorate = recode(governorate, 
                               "aleppo" = "Aleppo", 
                               "ALEPPO" = "Aleppo"), 
@@ -222,8 +217,6 @@ As of **`r report_date`**, a total of **`r sum_stats %>% pull(beneficiaries) %>%
 A total of USD **`r paste(format(round((sum_stats %>% pull(total_usd)) / 1000000, 1), trim = TRUE), "million")`** has been disbursed by **`r sum_stats %>% pull(partners)`** implementing agencies in **`r sum_stats %>% pull(communities)`** communities across **`r sum_stats %>% pull(sub_districts)`** sub-districts. 
 
 *Only beneficiaries who have received at least USD 100/family/month have been included; excludes sector-based activities such as non-MPC cash-for-food.*
-
-
 
 <br>
 
@@ -296,15 +289,12 @@ cbr  %>%
   save_as_image(path = "./img/summary_table.png")
 ```
 
+In February 2023, `r filter(cbr, month == 2 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` beneficiary frequencies were reached, and in March 2023 the number increased to `r filter(cbr, month == 3 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")`. In April 2023 `r filter(cbr, month == 4 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` were reached. As of May 2023, `r filter(cbr, month == 5 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` beneficiaries have been reached, followed by `r filter(cbr, month == 6 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` in June, and `r filter(cbr, month == 7 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` in July 2023.
 
 
-<br>
-
-`r filter(cbr, month == 2 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` beneficiary frequencies were reached in February 2023 and `r filter(cbr, month == 3 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` were reached in March 2023. `r filter(cbr, month == 4 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` were reached in April 2023 and `r filter(cbr, month == 5 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` have been reached in May 2023 and `r filter(cbr, month == 6 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` have been reached in June 2023 and `r filter(cbr, month == 7 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` have been reached in July 2023.
 
 *This document distinguishes between beneficiaries, or unique individuals reached, and beneficiary frequencies, or the number of times people have been reached, inclusive of double counting.*
 
-  
   
 ```{r eval=FALSE}
 cbr %>% 
@@ -313,7 +303,6 @@ cbr %>%
   {sum(.$beneficiaries, na.rm = TRUE)}
 
 ```
-
 
 
 <br><br>
@@ -362,7 +351,6 @@ progress_line %>%
   # Scale this down to "1 month" when the axis gets too crowded, 
   # Then you can just leave the date_label as "%b"
   scale_x_date(date_breaks = "2 weeks", date_labels = "%d-%b") +
-  # Why didn't you learn this before? 
   scale_y_continuous(labels = comma, expand = expansion(mult = .1)) + 
   labs(x = "Distribution date", 
        y = "Cumulative beneficiaries", 
@@ -381,7 +369,7 @@ ggsave("./img/progress_line.png", dpi = 300, height = 8.27, width = 11.69, units
 
 <br>
 
-The small number of beneficiaries reached earlier than February all pertained to the HRP, the only such beneficiaries reported so far. The CWG would like to encourage partners to report on their January achievements. 
+The small number of beneficiaries reached earlier than February all pertained to the HRP, the only such beneficiaries reported so far. The CWG would like to encourage partners to report on their January achievements.
 
 <br><br>
 
@@ -440,7 +428,7 @@ ggplotly(planned_implemented_map, tooltip = c("text")) %>%
 
 <br><br><br>
 
-# 3. Geographic breakdown of beneficiaries 
+# 3. Geographic breakdown of beneficiaries
 
 Coverage continues to be highest in Afrin and Harim districts, where the highest numbers of damaged houses and wounded people are located (though these areas do not necessarily have the highest proportions of damage). 
 
@@ -560,8 +548,6 @@ Below is a breakdown of beneficiaries based on whether they originate from camps
 ```{r table-camps-villages}
 cbr %>% 
   filter(project_status == "Completed" & previously_assisted == "No") %>% 
-  # Big assumption you're making here, but literally all of them have the word
-  # "camp" in their names
   mutate(village_camps = ifelse(village_camps %in% c("camp", "village") | is.na(village_camps), 
                                 village_camps, 
                                 "camp")) %>% 
@@ -588,12 +574,11 @@ avg_pc_reached <- cbr %>%
                                "afrin" = "Afrin")) %>%
   filter(project_status == "Completed" & 
            previously_assisted == "No") %>%
-  filter(!is.na(admin3pcode)) %>% 
-  group_by(sub_district, admin3pcode, governorate) %>%
-  summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE),
-                .groups = "drop") %>% 
-  # I forgot why I was doing this
-  left_join(hno %>% 
+    filter(!is.na(admin3pcode)) %>% 
+      group_by(sub_district, admin3pcode, governorate) %>%
+        summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE),
+          .groups = "drop") %>% 
+            left_join(hno %>% 
               filter(admin2name_en %in% c("Harim", "Idleb", "Jisr-Ash-Shugur", "Ariha", 
                               "Tell Abiad", 
                               "Afrin", "Jebel Saman", "A'zaz", "Jarablus", "Al Bab")) %>%
@@ -1101,7 +1086,7 @@ eq %>%
 
 <br><br>
 
-### 5.2 Reporting quality 
+### 5.2 Reporting quality
 
 ```{r}
 month_reporting <- cbr %>% 
@@ -1112,23 +1097,12 @@ month_reporting <- cbr %>%
 
 This section documents issues encountered in the cleaning of 4W and FSL data and their impacts on the quality of reporting the CWG can provide. The recommendations by the CWG are included to enhance reporting quality: 
 
-1. The CWG has shifted into a new 4Ws template for monthly reporting to better capture the earthquake response. Deadline is set on the 15th of each month. `r filter(month_reporting, month == 2) %>% pull(partners)` partners reported achievements in February and `r filter(month_reporting, month == 3) %>% pull(partners)` reported achievements in March, with `r filter(month_reporting, month == 4) %>% pull(partners)` partners having reported in April, `r filter(month_reporting, month == 5) %>% pull(partners)` having reported in May and `r filter(month_reporting, month == 6) %>% pull(partners)` having reported in June and `r filter(month_reporting, month == 7) %>% pull(partners)` having reported in July. If no MPC activities were implemented, please inform the CWG as well.
+1. The CWG has has adopted a new 4Ws template for monthly reporting, aiming to improve the documentation of the earthquake response efforts. **The reporting deadline is set on the 15th of each month.** In February `r filter(month_reporting, month == 2) %>% pull(partners)` partners reported their achievements, In March `r filter(month_reporting, month == 3) %>% pull(partners)` partners have reported their achievements, with `r filter(month_reporting, month == 4) %>% pull(partners)` partners having reported in April, in May `r filter(month_reporting, month == 5) %>% pull(partners)` partners have reported. `r filter(month_reporting, month == 6) %>% pull(partners)` partners have reported in June, and `r filter(month_reporting, month == 7) %>% pull(partners)` partners have reported in July. If no MPC activities were implemented, please inform the CWG as well.
 
-2. For this reporting period, activities pertaining to `r format(sum_stats %>% pull(beneficiaries) - max(progress_line$cum_label, na.rm = TRUE), big.mark = ",")` beneficiaries were missing their dates or had dates in unreadable formats. Please ensure that the `start date` and `end date` are entered in the format **mm/dd/yyyy** and select the `month of reporting` from the options in the drop down menu. 
+2. For this reporting period, activities pertaining to `r format(sum_stats %>% pull(beneficiaries) - max(progress_line$cum_label, na.rm = TRUE), big.mark = ",")` beneficiaries were missing their dates or had dates in unreadable formats. **Please ensure that the `start date` and `end date` are entered in the format (mm/dd/yyyy) and select the `month of reporting` from the options in the drop down menu.**
 
 3. For sex-and-age dis-aggregations, please do not back fill these columns using calculations based on the census or the MSNA. If no dis-aggregated data is available to your organisation, please leave these columns blank. 
 
 4. The Cash Working Group is currently only collecting planned and implemented **Multipurpose Cash** achievements. Whilst the CWG welcomes additional inputs on other CVA activities, we also want to ensure that the reporting load is as low as possible for partners i.e. if an agency has implemented Cash-for-Work, this should be reported to the ERL Cluster. The CWG will work with all Clusters to develop a consolidated picture of response-wide CVA interventions. 
 
-5. Please indicate in the `previously_assisted` column whether or not beneficiaries have been reached before. However, beneficiaries are being reported to the Cash Working Group for this first time, even if you have reached them before, please indicate `No` in this column. This column is used calculate the number of unique individuals reached. 
-
-
-
-
-
-
-
-
-
-
-
+5. Please indicate in the `previously_assisted` column whether or not beneficiaries have been reached before. However, if the beneficiaries are being reported for the first time to the Cash Working Group, even if you have reached them before, please indicate `No` in this column. This column is used calculate to the number of unique individuals reached. 
