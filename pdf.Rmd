@@ -212,7 +212,7 @@ A total of USD **`r paste(format(round((sum_stats %>% pull(total_usd)) / 1000000
 
 <br>
 
-```{r summary-table, eval=FALSE}
+```{r summary-table}
 cbr  %>% 
   filter(project_status == "Completed") %>%
   group_by(governorate, district) %>% 

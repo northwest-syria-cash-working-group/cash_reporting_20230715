@@ -218,9 +218,12 @@ A total of USD **`r paste(format(round((sum_stats %>% pull(total_usd)) / 1000000
 
 *Only beneficiaries who have received at least USD 100/family/month have been included; excludes sector-based activities such as non-MPC cash-for-food.*
 
+
+
+
 <br>
 
-```{r summary-table, eval=FALSE}
+```{r summary-table}
 cbr  %>% 
   filter(project_status == "Completed") %>%
   group_by(governorate, district) %>% 
@@ -288,6 +291,13 @@ cbr  %>%
   set_table_properties(layout = "autofit", width = 1) %>% 
   save_as_image(path = "./img/summary_table.png")
 ```
+
+
+
+
+
+
+<br>
 
 In February 2023, `r filter(cbr, month == 2 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` beneficiary frequencies were reached, and in March 2023 the number increased to `r filter(cbr, month == 3 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")`. In April 2023 `r filter(cbr, month == 4 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` were reached. As of May 2023, `r filter(cbr, month == 5 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` beneficiaries have been reached, followed by `r filter(cbr, month == 6 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` in June, and `r filter(cbr, month == 7 & project_status == "Completed") %>% {sum(.$beneficiaries, na.rm = TRUE)} %>% format(big.mark = ",")` in July 2023.
 
