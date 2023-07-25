@@ -717,7 +717,7 @@ cbr %>%
             geom_text(aes(label = comma(beneficiaries)), hjust = "inward") +
             scale_x_continuous(labels = unit_format(unit = "K", scale = 1e-3, accuracy = 1)) + 
             labs(title = "Planned beneficiaries -- Aleppo", 
-            x = "", 
+            x = "Planned beneficiaries", 
             y = "") + 
 
 cbr %>% 
