@@ -144,7 +144,7 @@ eq <- eq %>%
             by = "admin3pcode")
 
 cbr <- read_csv("./data/cbr_com.csv") %>% 
-  filter(total_value_per_hh != 75) %>%
+ # filter(total_value_per_hh != 75) %>%
   filter(str_detect(cluster, "Multipurpose")) %>% 
   mutate(month = month(end_date)) %>% 
   replace_na(list(beneficiaries = 0)) %>% 
